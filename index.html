@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FBF7F8">
+<meta name="description" content="Круг ежедневной отчётности: семь дел в день, с 23 сентября по 23 октября.">
+<title>Семь дел дня</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Golos+Text:wght@400;500;600&display=swap">
+<style>
+html{-webkit-text-size-adjust:100%}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<style>
+:root{
+  --ground:#FBF7F8;
+  --surface:#FFFFFF;
+  --surface-2:#F6EFF2;
+  --ink:#2E2430;
+  --ink-soft:#5C4D58;
+  --muted:#8A7A87;
+  --line:#EAE0E5;
+  --line-strong:#DCCCD5;
+  --accent:#A8577A;
+  --accent-deep:#7E3A59;
+  --accent-soft:#F6E6ED;
+  --gold:#B8862F;
+  --gold-soft:#F7EEDC;
+  --miss:#B06A5C;
+  --miss-soft:#F7E7E2;
+  --radius:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#17131A; --surface:#201A24; --surface-2:#282030;
+    --ink:#F2EAF0; --ink-soft:#D5C6D0; --muted:#A2919E;
+    --line:#332A3A; --line-strong:#463B4F;
+    --accent:#E08CB0; --accent-deep:#F0B3CC; --accent-soft:#3B2633;
+    --gold:#E0B15F; --gold-soft:#3A2E1B;
+    --miss:#D99182; --miss-soft:#3A2622;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#17131A; --surface:#201A24; --surface-2:#282030;
+  --ink:#F2EAF0; --ink-soft:#D5C6D0; --muted:#A2919E;
+  --line:#332A3A; --line-strong:#463B4F;
+  --accent:#E08CB0; --accent-deep:#F0B3CC; --accent-soft:#3B2633;
+  --gold:#E0B15F; --gold-soft:#3A2E1B;
+  --miss:#D99182; --miss-soft:#3A2622;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--ground);color:var(--ink);
+  font-family:"Golos Text","Segoe UI",system-ui,-apple-system,sans-serif;
+  font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:720px;margin:0 auto;padding-inline:16px;padding-block:18px 44px}
+
+h1{font-family:Lora,Georgia,serif;font-weight:600;font-size:27px;line-height:1.15;margin:0;letter-spacing:-.01em}
+.brand{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand .sub{font-size:12px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
+
+/* ---- identity picker (top) ---- */
+.ident{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px}
+.ident .lbl{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);flex:0 0 auto}
+.chips{display:flex;gap:5px;flex-wrap:wrap}
+.chips button{
+  border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-soft);
+  font:inherit;font-size:12.5px;padding:3px 11px;border-radius:99px;cursor:pointer;transition:.15s;
+}
+.chips button:hover{border-color:var(--accent);color:var(--accent)}
+.chips button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* ---- day bar + tabs ---- */
+.daybar{display:flex;align-items:center;gap:10px;margin-top:16px}
+.nav{
+  width:32px;height:32px;flex:0 0 auto;border-radius:50%;
+  border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-soft);
+  font-size:15px;line-height:1;cursor:pointer;display:grid;place-items:center;transition:.15s;
+}
+.nav:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.nav:disabled{opacity:.3;cursor:default}
+.dayinfo{flex:1 1 auto;min-width:0}
+.daydate{font-family:Lora,Georgia,serif;font-size:17.5px;font-weight:500;line-height:1.25}
+.daymeta{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.today-chip{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;background:var(--accent-soft);color:var(--accent-deep);padding:2px 8px;border-radius:99px;font-weight:500}
+.back-today{border:0;background:none;color:var(--accent);font:inherit;font-size:12.5px;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px}
+
+.tabs{display:flex;gap:4px;margin:16px 0 20px;background:var(--surface-2);padding:3px;border-radius:99px}
+.tab{flex:1;border:0;background:none;font:inherit;font-size:13.5px;font-weight:500;color:var(--muted);padding:7px 10px;border-radius:99px;cursor:pointer;transition:.15s}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(46,36,48,.07)}
+
+/* ---- distance to the goal ---- */
+.dist{display:flex;align-items:center;gap:11px;margin:-6px 0 18px;font-size:12.5px;color:var(--muted);flex-wrap:wrap}
+.dist b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.dist .dm{flex:1 1 90px;height:5px;border-radius:99px;background:var(--surface-2);overflow:hidden;min-width:70px}
+.dist .dm > i{display:block;height:100%;background:var(--accent-deep);border-radius:99px;transition:width .4s ease}
+.dist.done{color:var(--gold)}
+.dist.done b{color:var(--gold)}
+.dist.done .dm > i{background:var(--gold)}
+
+/* ---- finale ---- */
+.prestart{background:var(--accent-soft);border:1px solid var(--accent);border-radius:var(--radius);padding:16px 18px;margin-bottom:16px}
+.prestart h2{font-family:Lora,Georgia,serif;font-size:20px;font-weight:600;margin:0 0 4px;color:var(--accent-deep)}
+.prestart p{margin:0;font-size:13.5px;line-height:1.55;color:var(--ink)}
+.prestart b{font-weight:600}
+.finale{background:var(--gold-soft);border:1px solid var(--gold);border-radius:var(--radius);padding:16px 18px;margin-bottom:16px}
+.finale h2{font-family:Lora,Georgia,serif;font-size:21px;font-weight:600;margin:0 0 2px;color:var(--gold)}
+.finale .cap{font-size:12.5px;color:var(--ink-soft);margin:0 0 12px}
+.frow{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-top:1px solid var(--gold)}
+.frow .rk{width:22px;height:22px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;font-size:11.5px;font-weight:600;background:var(--surface);color:var(--gold);margin-top:1px}
+.frow .fbody{flex:1 1 auto;min-width:0}
+.frow .nm{display:block;font-family:Lora,Georgia,serif;font-size:16px;font-weight:500;line-height:1.25;color:var(--ink)}
+.frow .fg{display:block;font-size:12.5px;line-height:1.4;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.frow .fg b{color:var(--ink);font-weight:600}
+
+/* ---- summary ---- */
+.summary{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:13px 16px;margin-bottom:14px}
+.summary .big{font-family:Lora,Georgia,serif;font-size:28px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+.summary .lbl{font-size:12.5px;color:var(--muted);line-height:1.35}
+.meter{flex:1 1 auto;height:7px;border-radius:99px;background:var(--surface-2);overflow:hidden;min-width:50px}
+.meter > i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .35s ease}
+
+/* ---- board table ---- */
+.board-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px 12px}
+table.board{width:100%;table-layout:fixed;border-collapse:collapse}
+table.board th, table.board td{padding:0}
+.corner{text-align:left;font-weight:400;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-bottom:9px!important;vertical-align:bottom}
+.phead{vertical-align:bottom;padding-bottom:9px!important}
+.phead .pn{font-family:Lora,Georgia,serif;font-size:13px;font-weight:500;line-height:1.15;word-break:break-word}
+.phead .pc{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;line-height:1.3}
+.phead.full .pn{color:var(--gold)}
+.phead.full .pc{color:var(--gold)}
+.colme{background:var(--accent-soft)}
+.phead.colme{border-radius:8px 8px 0 0}
+table.board col.lab{width:33%}
+.tlabel{
+  font-size:12.5px;line-height:1.3;color:var(--ink);font-weight:400;text-align:left;
+  padding:8px 8px 8px 0!important;border-top:1px solid var(--line);vertical-align:middle;
+}
+td.cellc{border-top:1px solid var(--line);text-align:center;vertical-align:middle}
+tbody tr:last-child td.colme{border-radius:0 0 8px 8px}
+.cellbtn{
+  width:100%;min-height:38px;border:0;background:none;cursor:pointer;padding:6px 0;
+  display:grid;place-items:center;
+}
+.cellbtn:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:6px}
+.dot{
+  width:23px;height:23px;border-radius:50%;border:1.5px solid var(--line-strong);
+  display:grid;place-items:center;font-size:12px;line-height:1;color:transparent;
+  transition:background .15s,border-color .15s,color .15s;
+}
+.cellbtn:hover:not(:disabled) .dot{border-color:var(--accent)}
+.cellbtn:disabled{cursor:default}
+.v1 .dot{background:var(--accent);border-color:var(--accent);color:#fff}
+.v2 .dot{background:var(--miss-soft);border-color:var(--miss);color:var(--miss)}
+.legend-row{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:12px;font-size:12px;color:var(--muted)}
+.legend-row i{width:15px;height:15px;border-radius:50%;display:grid;place-items:center;font-size:9px;font-style:normal;border:1.5px solid var(--line-strong)}
+.legend-row .l1{background:var(--accent);border-color:var(--accent);color:#fff}
+.legend-row .l2{background:var(--miss-soft);border-color:var(--miss);color:var(--miss)}
+.hint{font-size:12.5px;color:var(--muted);margin:14px 2px 0;line-height:1.5}
+
+/* ---- stats ---- */
+.block{margin-bottom:24px}
+.block h2{font-family:Lora,Georgia,serif;font-size:19px;font-weight:600;margin:0 0 3px}
+.block .cap{font-size:12.5px;color:var(--muted);margin:0 0 12px;line-height:1.45}
+.who-line{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:3px}
+.who-line .nm{font-family:Lora,Georgia,serif;font-size:23px;font-weight:600;line-height:1.1}
+.who-line .tag{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:2px 9px;border-radius:99px}
+
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:9px;margin-bottom:18px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px}
+.tile b{display:block;font-family:Lora,Georgia,serif;font-size:26px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.tile span{display:block;font-size:12px;color:var(--muted);line-height:1.35;margin-top:2px}
+.tile.hot b{color:var(--gold)}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .wd{font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);text-align:center;padding-bottom:2px}
+.day{aspect-ratio:1;border-radius:5px;background:var(--surface-2);display:grid;place-items:center;font-size:10.5px;color:var(--muted);font-variant-numeric:tabular-nums;max-width:100%}
+.day.void{background:transparent}
+.day.on{color:var(--accent-deep);font-weight:500}
+.day.done{background:var(--gold-soft);color:var(--gold);font-weight:600}
+.day.miss{background:var(--miss-soft);color:var(--miss)}
+.day.today{box-shadow:0 0 0 2px var(--accent)}
+.legend{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);margin-top:12px;flex-wrap:wrap}
+.legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+
+.bar{margin-bottom:11px}
+.bar:last-child{margin-bottom:0}
+.bar .lab{display:flex;justify-content:space-between;gap:10px;font-size:13px;margin-bottom:5px;line-height:1.3}
+.bar .lab b{font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink-soft);flex:0 0 auto}
+.track{height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.track > i{display:block;height:100%;border-radius:99px;background:var(--accent);transition:width .4s ease}
+.track > i.weak{background:var(--miss)}
+
+.srow{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);flex-wrap:wrap}
+.srow:first-child{border-top:0}
+.srow .rk{width:22px;height:22px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;font-size:11.5px;font-weight:600;background:var(--surface-2);color:var(--muted)}
+.srow .rk.top{background:var(--gold-soft);color:var(--gold)}
+.srow .nm{font-family:Lora,Georgia,serif;font-size:15.5px;font-weight:500;flex:1 1 auto;min-width:0}
+.srow.mine .nm{color:var(--accent)}
+.srow .fg{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.srow .fg b{color:var(--ink);font-weight:600}
+
+.note{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius);padding:11px 14px;font-size:13px;color:var(--ink-soft);margin-bottom:14px;line-height:1.5}
+.note.warn{background:var(--miss-soft);border-color:var(--miss);color:var(--ink)}
+footer{margin-top:28px;font-size:12.5px;color:var(--muted);line-height:1.55;text-align:center}
+
+@media (max-width:430px){
+  h1{font-size:23px}
+  .wrap{padding-inline:14px}
+  .board-card{padding:10px 8px 12px}
+  table.board col.lab{width:29%}
+  .tlabel{font-size:11.5px;padding-right:5px!important}
+  .phead .pn{font-size:10.5px;letter-spacing:-.01em}
+  .phead .pc{font-size:10px}
+  .dot{width:21px;height:21px}
+  .ident .lbl{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <h1>Семь дел дня</h1>
+      <div class="sub">Наш круг · 5 участниц</div>
+    </div>
+
+    <div class="ident">
+      <span class="lbl">Я — это</span>
+      <span class="chips" id="chips"></span>
+    </div>
+
+    <div class="daybar">
+      <button class="nav" id="prev" type="button" aria-label="Предыдущий день">‹</button>
+      <div class="dayinfo">
+        <div class="daydate" id="dayDate">—</div>
+        <div class="daymeta" id="dayMeta"></div>
+      </div>
+      <button class="nav" id="next" type="button" aria-label="Следующий день">›</button>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" id="tabDay" role="tab" aria-selected="true" type="button">День</button>
+      <button class="tab" id="tabStats" role="tab" aria-selected="false" type="button">Мой прогресс</button>
+    </div>
+
+    <div class="dist" id="dist"></div>
+  </header>
+
+  <main>
+    <div id="banner"></div>
+
+    <section id="dayView" role="tabpanel" aria-labelledby="tabDay">
+      <div id="finale"></div>
+      <div class="summary">
+        <div>
+          <div class="big" id="sumPct">0%</div>
+          <div class="lbl">круг за день</div>
+        </div>
+        <div class="meter"><i id="sumBar" style="width:0%"></i></div>
+        <div style="text-align:right">
+          <div class="big" id="sumCnt">0</div>
+          <div class="lbl">из 35 дел</div>
+        </div>
+      </div>
+
+      <div class="board-card">
+        <table class="board" id="board"></table>
+        <div class="legend-row">
+          <span><i class="l1">✓</i> сделано</span>
+          <span><i class="l2">✕</i> не получилось</span>
+          <span><i></i> без отметки</span>
+        </div>
+      </div>
+
+      <p class="hint" id="hint">
+        Нажимайте на клетку: <b>первое нажатие</b> — сделано, <b>второе</b> — не получилось,
+        <b>третье</b> — снять отметку. Отметки видны всем и сохраняются сами.
+      </p>
+    </section>
+
+    <section id="statsView" role="tabpanel" aria-labelledby="tabStats" hidden></section>
+  </main>
+
+  <footer>
+    Круг: 23 сентября — 23 октября 2026, 31 день.<br>
+    День сменяется в 23:00 по времени вашего устройства.
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* =======================================================================
+     АДРЕС ОБЩЕГО ХРАНИЛИЩА
+     Вставьте сюда адрес базы Firebase Realtime Database — без косой черты
+     в конце. Пример: https://semь-del-default-rtdb.firebaseio.com
+     ======================================================================= */
+  var DB_URL = "https://seven-deeds-default-rtdb.europe-west1.firebasedatabase.app";
+
+  var CONFIGURED = /^https:\/\/[^\s]+$/.test(DB_URL);
+
+  var PEOPLE = [
+    {id:"zaira",   name:"Заира"},
+    {id:"medina",  name:"Медина"},
+    {id:"sumaya",  name:"Сумая"},
+    {id:"aiset",   name:"Айсет"},
+    {id:"marziyat",name:"Марзият"}
+  ];
+  var TASKS = [
+    "Режим сна",
+    "Чтение книг 20 мин",
+    "Тренировка 30 мин",
+    "Утренние азкары",
+    "Вечерние азкары",
+    "Чтение Корана 30 мин",
+    "Истиг1фар 1000 раз"
+  ];
+  var START = "2026-09-23";
+  var FINISH = "2026-10-23";
+  var ROLL_HOUR = 23;
+  var TOTAL = PEOPLE.length * TASKS.length;
+  var GOAL_DAYS = 31;
+  var GOAL_DEEDS = GOAL_DAYS * TASKS.length;
+
+  var MONTHS = ["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
+  var WEEK = ["воскресенье","понедельник","вторник","среда","четверг","пятница","суббота"];
+  var WD = ["пн","вт","ср","чт","пт","сб","вс"];
+
+  function pad(n){ return n < 10 ? "0" + n : "" + n; }
+  function ymd(d){ return d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate()); }
+  function parseKey(k){ var p = k.split("-"); return new Date(+p[0], +p[1]-1, +p[2]); }
+  function rawToday(){
+    var n = new Date();
+    var d = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+    if (n.getHours() >= ROLL_HOUR) d.setDate(d.getDate() + 1);
+    return ymd(d);
+  }
+  function todayKey(){
+    var k = rawToday();
+    return k < START ? START : k;
+  }
+  function notStarted(){ return rawToday() < START; }
+  function daysToStart(){ return Math.round((parseKey(START) - parseKey(rawToday())) / 86400000); }
+  function shift(key, delta){ var d = parseKey(key); d.setDate(d.getDate() + delta); return ymd(d); }
+  function longDate(key){ var d = parseKey(key); return d.getDate() + " " + MONTHS[d.getMonth()] + " " + d.getFullYear(); }
+  function weekday(key){ return WEEK[parseKey(key).getDay()]; }
+  function daysFromStart(key){ return Math.round((parseKey(key) - parseKey(START)) / 86400000); }
+  function finished(){ return todayKey() > FINISH; }
+  function activeDay(){ var t = todayKey(); return t > FINISH ? FINISH : t; }
+  function history(){
+    if (notStarted()) return [];
+    var out = [], c = START, t = activeDay(), guard = 0;
+    while (c <= t && guard < 3000){ out.push(c); c = shift(c, 1); guard++; }
+    return out;
+  }
+  function plural(n, one, few, many){
+    var a = n % 10, b = n % 100;
+    if (a === 1 && b !== 11) return one;
+    if (a >= 2 && a <= 4 && (b < 10 || b >= 20)) return few;
+    return many;
+  }
+
+  var marks = {};
+  var viewKey = activeDay();
+  var tab = "day";
+  var lastErr = false, lastActive = activeDay();
+  var me = null;
+  try { me = localStorage.getItem("sevendeeds.me"); } catch(e){}
+  if (me && !PEOPLE.some(function(p){ return p.id === me; })) me = null;
+
+  function keyOf(d, p){ return d + "_" + p; }
+  function statesFor(d, p){ return marks[keyOf(d, p)] || [0,0,0,0,0,0,0]; }
+  function doneCount(a){ var n = 0; for (var i=0;i<a.length;i++) if (a[i] === 1) n++; return n; }
+  function touched(a){ for (var i=0;i<a.length;i++) if (a[i] !== 0) return true; return false; }
+
+  /* ---------- общее хранилище (Firebase Realtime Database) ---------- */
+  function dbPut(id, body){
+    return fetch(DB_URL + "/marks/" + encodeURIComponent(id) + ".json", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    }).then(function(r){ if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); });
+  }
+  function dbGetAll(){
+    return fetch(DB_URL + "/marks.json?t=" + Date.now(), { cache: "no-store" })
+      .then(function(r){ if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); });
+  }
+
+  var busy = {}, queued = {};
+  function persist(date, pid){
+    var id = keyOf(date, pid);
+    if (busy[id]) { queued[id] = true; return; }
+    if (!CONFIGURED) return;
+    busy[id] = true;
+    dbPut(id, { date: date, person: pid, states: statesFor(date, pid).slice(), updated: Date.now() })
+      .then(function(){
+        busy[id] = false;
+        if (lastErr){ lastErr = false; showBanner(null); }
+        if (queued[id]) { queued[id] = false; persist(date, pid); }
+        else pull();
+      })
+      .catch(function(){
+        busy[id] = false; queued[id] = false; lastErr = true;
+        showBanner("Отметка не сохранилась — проверьте интернет и нажмите ещё раз.", true);
+      });
+  }
+
+  function pull(){
+    if (!CONFIGURED) return;
+    dbGetAll().then(function(obj){
+      var next = {}, k;
+      if (obj) Object.keys(obj).forEach(function(id){
+        var d = obj[id];
+        if (!d || !Array.isArray(d.states)) return;
+        var st = d.states.slice(0, TASKS.length);
+        while (st.length < TASKS.length) st.push(0);
+        next[id] = st.map(function(v){ return (v === 1 || v === 2) ? v : 0; });
+      });
+      for (k in busy) if (busy[k] && marks[k]) next[k] = marks[k];
+      for (k in queued) if (queued[k] && marks[k]) next[k] = marks[k];
+      marks = next;
+      if (lastErr){ lastErr = false; showBanner(null); }
+      var now = activeDay();
+      if (now !== lastActive){ if (viewKey === lastActive) viewKey = now; lastActive = now; }
+      render();
+    }).catch(function(){
+      if (!lastErr){
+        lastErr = true;
+        showBanner("Нет связи с хранилищем — показаны последние загруженные отметки.", true);
+      }
+    });
+  }
+
+  function cycle(date, pid, idx){
+    if (finished() || notStarted()) return;
+    var cur = statesFor(date, pid).slice();
+    cur[idx] = (cur[idx] + 1) % 3;
+    marks[keyOf(date, pid)] = cur;
+    render();
+    persist(date, pid);
+  }
+
+  /* ---------- per-person analytics ---------- */
+  function streak(pid){
+    var days = history(), t = activeDay(), n = 0;
+    for (var i = days.length - 1; i >= 0; i--){
+      var c = doneCount(statesFor(days[i], pid));
+      if (c === TASKS.length) n++;
+      else if (days[i] === t) continue;
+      else break;
+    }
+    return n;
+  }
+  function bestStreak(pid){
+    var days = history(), best = 0, run = 0;
+    for (var i=0;i<days.length;i++){
+      if (doneCount(statesFor(days[i], pid)) === TASKS.length){ run++; if (run > best) best = run; }
+      else run = 0;
+    }
+    return best;
+  }
+  function totals(pid){
+    var days = history(), done = 0, full = 0;
+    for (var i=0;i<days.length;i++){
+      var st = statesFor(days[i], pid), d = doneCount(st);
+      done += d;
+      if (d === TASKS.length) full++;
+    }
+    return { done: done, full: full, days: days.length,
+             avg: days.length ? Math.round(done / (days.length * TASKS.length) * 100) : 0 };
+  }
+  function taskRate(pid, i){
+    var days = history(), done = 0;
+    for (var k=0;k<days.length;k++) if (statesFor(days[k], pid)[i] === 1) done++;
+    return days.length ? Math.round(done / days.length * 100) : 0;
+  }
+  function groupTaskRate(i){
+    var days = history(), done = 0, slots = days.length * PEOPLE.length;
+    for (var k=0;k<days.length;k++)
+      for (var j=0;j<PEOPLE.length;j++)
+        if (statesFor(days[k], PEOPLE[j].id)[i] === 1) done++;
+    return slots ? Math.round(done / slots * 100) : 0;
+  }
+  function personName(pid){
+    for (var i=0;i<PEOPLE.length;i++) if (PEOPLE[i].id === pid) return PEOPLE[i].name;
+    return "";
+  }
+
+  /* ---------- dom ---------- */
+  var el = {};
+  ["board","dayDate","dayMeta","sumPct","sumCnt","sumBar","prev","next","dist","finale","hint",
+   "dayView","statsView","tabDay","tabStats","chips","banner"].forEach(function(k){
+    el[k] = document.getElementById(k);
+  });
+
+  var bannerMsg = null, bannerWarn = false;
+  function showBanner(m, w){ bannerMsg = m; bannerWarn = !!w; renderBanner(); }
+  function renderBanner(){
+    var h = "";
+    if (!CONFIGURED) h = '<div class="note warn"><b>Страница ещё не подключена к общему хранилищу.</b> ' +
+      'Отметки сейчас видны только на этом устройстве и пропадут при перезагрузке. ' +
+      'Нужно вписать адрес базы в строку DB_URL в начале файла.</div>';
+    else if (bannerMsg) h = '<div class="note' + (bannerWarn ? " warn" : "") + '">' + bannerMsg + "</div>";
+    el.banner.innerHTML = h;
+  }
+
+  function renderChips(){
+    var h = "";
+    PEOPLE.forEach(function(p){
+      h += '<button type="button" data-id="' + p.id + '" aria-pressed="' + (me === p.id) + '">' + p.name + "</button>";
+    });
+    el.chips.innerHTML = h;
+    var bs = el.chips.querySelectorAll("button");
+    for (var i=0;i<bs.length;i++) bs[i].addEventListener("click", function(){
+      var id = this.getAttribute("data-id");
+      me = (me === id) ? null : id;
+      try { me ? localStorage.setItem("sevendeeds.me", me) : localStorage.removeItem("sevendeeds.me"); } catch(e){}
+      render();
+    });
+  }
+
+  function renderDist(){
+    var done = finished();
+    if (notStarted()){
+      var left = daysToStart();
+      el.dist.className = "dist";
+      el.dist.innerHTML = "<span>Старт <b>23 сентября</b></span>" +
+        '<span class="dm"><i style="width:0%"></i></span>' +
+        "<span>" + (left <= 1 ? "начинаем сегодня в 23:00"
+                              : "через <b>" + left + "</b> " + plural(left,"день","дня","дней")) + "</span>";
+      return;
+    }
+    var n = done ? GOAL_DAYS : daysFromStart(activeDay()) + 1;
+    var left = GOAL_DAYS - n;
+    var pct = Math.round(n / GOAL_DAYS * 100);
+    el.dist.className = "dist" + (done ? " done" : "");
+    if (done){
+      el.dist.innerHTML = "<span>Круг пройден · <b>" + GOAL_DAYS + "</b> " +
+        plural(GOAL_DAYS,"день","дня","дней") + " с 23 сентября по 23 октября</span>" +
+        '<span class="dm"><i style="width:100%"></i></span>';
+    } else {
+      el.dist.innerHTML = "<span>День <b>" + n + "</b> из <b>" + GOAL_DAYS + "</b></span>" +
+        '<span class="dm"><i style="width:' + pct + '%"></i></span>' +
+        "<span>" + (left > 0 ? "до 23 октября <b>" + left + "</b> " + plural(left,"день","дня","дней")
+                             : "сегодня финиш") + "</span>";
+    }
+  }
+
+  function finalRows(){
+    return PEOPLE.map(function(p){
+      var tt = totals(p.id);
+      return { p: p, done: tt.done, full: tt.full, avg: tt.avg, best: bestStreak(p.id) };
+    }).sort(function(a, b){ return b.done - a.done || b.full - a.full; });
+  }
+
+  function renderDay(){
+    var t = activeDay(), done = finished(), pre = notStarted();
+    el.dayDate.textContent = longDate(viewKey);
+    var meta = "<span>" + weekday(viewKey) + "</span>";
+    if (pre) meta += '<span class="today-chip">первый день</span>';
+    else if (viewKey === t && !done) meta += '<span class="today-chip">сегодня</span>';
+    else {
+      meta += "<span>день " + (daysFromStart(viewKey) + 1) + " из " + GOAL_DAYS + "</span>";
+      if (viewKey !== t) meta += '<button class="back-today" id="backToday" type="button">' +
+        (done ? "к последнему дню" : "к сегодняшнему") + "</button>";
+    }
+    el.dayMeta.innerHTML = meta;
+    var bt = document.getElementById("backToday");
+    if (bt) bt.addEventListener("click", function(){ viewKey = t; render(); });
+
+    el.prev.disabled = viewKey <= START;
+    el.next.disabled = viewKey >= t;
+
+    if (pre){
+      var left = daysToStart();
+      el.finale.innerHTML = '<div class="prestart"><h2>Круг ещё не начался</h2>' +
+        "<p>Первый день — <b>23 сентября</b>. Отметки откроются " +
+        (left <= 1 ? "сегодня в 23:00, когда наступит новый день."
+                   : "через " + left + " " + plural(left,"день","дня","дней") + ".") +
+        " Пока таблицу можно показать участницам, чтобы все знали, что их ждёт.</p></div>";
+      el.hint.hidden = true;
+    } else if (done){
+      var f = '<div class="finale"><h2>Круг пройден</h2>' +
+        '<p class="cap">23 сентября — 23 октября · ' + GOAL_DAYS + " " +
+        plural(GOAL_DAYS,"день","дня","дней") + ", по 7 дел каждый день. Итог:</p>";
+      finalRows().forEach(function(r, i){
+        f += '<div class="frow"><span class="rk">' + (i + 1) + "</span>" +
+             '<span class="fbody"><span class="nm">' + r.p.name + "</span>" +
+             '<span class="fg"><b>' + r.done + "</b> из " + GOAL_DEEDS + " дел · <b>" + r.avg + "%</b> · " +
+             "<b>" + r.full + "</b> " + plural(r.full,"полный день","полных дня","полных дней") +
+             " · лучшая серия <b>" + r.best + "</b></span></span></div>";
+      });
+      f += "</div>";
+      el.finale.innerHTML = f;
+      el.hint.hidden = true;
+    } else {
+      el.finale.innerHTML = "";
+      el.hint.hidden = false;
+    }
+
+    var total = 0;
+    PEOPLE.forEach(function(p){ total += doneCount(statesFor(viewKey, p.id)); });
+    var pct = Math.round(total / TOTAL * 100);
+    el.sumPct.textContent = pct + "%";
+    el.sumCnt.textContent = total;
+    el.sumBar.style.width = pct + "%";
+
+    var h = '<colgroup><col class="lab">';
+    PEOPLE.forEach(function(){ h += "<col>"; });
+    h += "</colgroup>";
+
+    h += '<thead><tr><th class="corner" scope="col">дело</th>';
+    PEOPLE.forEach(function(p){
+      var d = doneCount(statesFor(viewKey, p.id));
+      var cls = "phead" + (p.id === me ? " colme" : "") + (d === TASKS.length ? " full" : "");
+      h += '<th class="' + cls + '" scope="col"><div class="pn">' + p.name + '</div><div class="pc">' + d + "/" + TASKS.length + "</div></th>";
+    });
+    h += "</tr></thead><tbody>";
+
+    TASKS.forEach(function(name, i){
+      h += '<tr><th class="tlabel" scope="row">' + name + "</th>";
+      PEOPLE.forEach(function(p){
+        var v = statesFor(viewKey, p.id)[i];
+        var mark = v === 1 ? "✓" : (v === 2 ? "✕" : "");
+        var lbl = v === 1 ? "сделано" : (v === 2 ? "не получилось" : "без отметки");
+        h += '<td class="cellc' + (p.id === me ? " colme" : "") + '">' +
+             '<button class="cellbtn v' + v + '" type="button"' + (done || pre ? " disabled" : "") +
+             ' data-p="' + p.id + '" data-i="' + i + '" ' +
+             'aria-label="' + p.name + ": " + name + " — " + lbl + '">' +
+             '<span class="dot" aria-hidden="true">' + mark + "</span></button></td>";
+      });
+      h += "</tr>";
+    });
+    h += "</tbody>";
+    el.board.innerHTML = h;
+
+    var cs = el.board.querySelectorAll(".cellbtn");
+    for (var k=0;k<cs.length;k++) cs[k].addEventListener("click", function(){
+      cycle(viewKey, this.getAttribute("data-p"), +this.getAttribute("data-i"));
+    });
+  }
+
+  /* ---------- calendar (4 weeks, Mon-first) ---------- */
+  function calDays(){
+    var t = parseKey(activeDay());
+    var dow = (t.getDay() + 6) % 7;              // 0 = понедельник
+    var end = new Date(t); end.setDate(end.getDate() + (6 - dow));   // воскресенье текущей недели
+    var start = new Date(end); start.setDate(start.getDate() - 27);
+    var out = [], c = new Date(start);
+    for (var i=0;i<28;i++){ out.push(ymd(c)); c.setDate(c.getDate() + 1); }
+    return out;
+  }
+
+  function renderStats(){
+    var days = history();
+    var h = "";
+
+    if (notStarted()){
+      var left = daysToStart();
+      el.statsView.innerHTML = '<div class="prestart"><h2>Статистика появится после старта</h2>' +
+        "<p>Круг начинается <b>23 сентября</b>" +
+        (left <= 1 ? " — сегодня в 23:00" : ", через " + left + " " + plural(left,"день","дня","дней")) +
+        ". С первого же дня здесь будет видно вашу серию, календарь и разбор по каждому из семи дел.</p></div>";
+      return;
+    }
+
+    if (!me){
+      h += '<div class="note">Выберите своё имя вверху страницы — здесь появится ваша личная статистика: серия дней, календарь и разбор по каждому делу.</div>';
+    } else {
+      var t = totals(me), s = streak(me), b = bestStreak(me);
+      h += '<div class="block">';
+      h += '<div class="who-line"><span class="nm">' + personName(me) + '</span><span class="tag">ваш путь</span></div>';
+      h += '<p class="cap">' +
+           (finished() ? "Круг пройден" : "День " + (daysFromStart(activeDay()) + 1) + " из " + GOAL_DAYS) +
+           " · цель — дойти до 23 октября</p>";
+
+      h += '<div class="tiles">';
+      h += '<div class="tile' + (s > 0 ? " hot" : "") + '"><b>' + s + "</b><span>" + plural(s,"день","дня","дней") + " подряд сейчас</span></div>";
+      h += '<div class="tile"><b>' + t.avg + "%</b><span>в среднем за день</span></div>";
+      h += '<div class="tile"><b>' + t.done + "</b><span>дел из " + GOAL_DEEDS + " за круг</span></div>";
+      h += '<div class="tile"><b>' + b + "</b><span>личный рекорд серии</span></div>";
+      h += "</div>";
+
+      var fullPct = Math.round(t.full / GOAL_DAYS * 100);
+      var deedPct = Math.round(t.done / GOAL_DEEDS * 100);
+      h += '<div class="panel" style="margin-bottom:18px">' +
+           '<div class="bar"><div class="lab"><span>Дней закрыто полностью</span><b>' + t.full + " / " + GOAL_DAYS + "</b></div>" +
+           '<div class="track"><i style="width:' + fullPct + '%"></i></div></div>' +
+           '<div class="bar"><div class="lab"><span>Дел за весь круг</span><b>' + t.done + " / " + GOAL_DEEDS + "</b></div>" +
+           '<div class="track"><i style="width:' + deedPct + '%"></i></div></div></div>';
+
+      var cal = calDays(), tk = activeDay();
+      h += '<div class="panel"><div class="cal">';
+      WD.forEach(function(w){ h += '<div class="wd">' + w + "</div>"; });
+      cal.forEach(function(d){
+        if (d < START || d > tk){ h += '<div class="day void"></div>'; return; }
+        var st = statesFor(d, me), c = doneCount(st);
+        var cls = "day";
+        if (c === TASKS.length) cls += " done";
+        else if (touched(st)) cls += " on";
+        else if (d < tk) cls += " miss";
+        if (d === tk) cls += " today";
+        h += '<div class="' + cls + '" title="' + longDate(d) + ": " + c + "/" + TASKS.length + '">' + c + "</div>";
+      });
+      h += "</div>";
+      h += '<div class="legend">' +
+           '<i style="background:var(--gold-soft)"></i><span>все семь</span>' +
+           '<i style="background:var(--surface-2)"></i><span>частично</span>' +
+           '<i style="background:var(--miss-soft)"></i><span>без отметок</span>' +
+           "</div></div></div>";
+
+      h += '<div class="block"><h2>Ваши дела по отдельности</h2>' +
+           '<p class="cap">Как часто вы закрывали каждое дело за ' + days.length + " " + plural(days.length,"день","дня","дней") + ".</p><div class=\"panel\">";
+      var rates = TASKS.map(function(n, i){ return { n: n, r: taskRate(me, i) }; })
+                       .sort(function(a, b){ return b.r - a.r; });
+      rates.forEach(function(x){
+        h += '<div class="bar"><div class="lab"><span>' + x.n + "</span><b>" + x.r + "%</b></div>" +
+             '<div class="track"><i class="' + (x.r < 50 ? "weak" : "") + '" style="width:' + x.r + '%"></i></div></div>';
+      });
+      h += "</div></div>";
+    }
+
+    h += '<div class="block"><h2>Круг вместе</h2><p class="cap">Общий счёт с 23 сентября · дистанция ' +
+         GOAL_DAYS + " " + plural(GOAL_DAYS,"день","дня","дней") + '.</p><div class="panel">';
+    var rows = PEOPLE.map(function(p){
+      var tt = totals(p.id);
+      return { p: p, done: tt.done, avg: tt.avg, s: streak(p.id) };
+    }).sort(function(a, b){ return b.done - a.done || b.s - a.s; });
+    rows.forEach(function(r, i){
+      h += '<div class="srow' + (r.p.id === me ? " mine" : "") + '">' +
+           '<span class="rk' + (i === 0 && r.done > 0 ? " top" : "") + '">' + (i + 1) + "</span>" +
+           '<span class="nm">' + r.p.name + "</span>" +
+           '<span class="fg"><b>' + r.done + "</b> дел · <b>" + r.avg + "%</b> · серия <b>" + r.s + "</b></span></div>";
+    });
+    h += "</div></div>";
+
+    h += '<div class="block"><h2>Что легче даётся кругу</h2>' +
+         '<p class="cap">Доля выполнений по всем участницам за всё время.</p><div class="panel">';
+    TASKS.map(function(n, i){ return { n: n, r: groupTaskRate(i) }; })
+         .sort(function(a, b){ return b.r - a.r; })
+         .forEach(function(x){
+      h += '<div class="bar"><div class="lab"><span>' + x.n + "</span><b>" + x.r + "%</b></div>" +
+           '<div class="track"><i class="' + (x.r < 50 ? "weak" : "") + '" style="width:' + x.r + '%"></i></div></div>';
+    });
+    h += "</div></div>";
+
+    el.statsView.innerHTML = h;
+  }
+
+  function render(){
+    renderChips();
+    renderDist();
+    el.tabDay.textContent = finished() ? "Итог круга" : "День";
+    if (tab === "day"){ el.dayView.hidden = false; el.statsView.hidden = true; renderDay(); }
+    else { el.dayView.hidden = true; el.statsView.hidden = false; renderStats(); }
+    el.tabDay.setAttribute("aria-selected", tab === "day");
+    el.tabStats.setAttribute("aria-selected", tab === "stats");
+  }
+
+  el.prev.addEventListener("click", function(){ if (viewKey > START){ viewKey = shift(viewKey, -1); render(); } });
+  el.next.addEventListener("click", function(){ if (viewKey < activeDay()){ viewKey = shift(viewKey, 1); render(); } });
+  el.tabDay.addEventListener("click", function(){ tab = "day"; render(); });
+  el.tabStats.addEventListener("click", function(){ tab = "stats"; render(); });
+
+  render();
+  renderBanner();
+
+  if (CONFIGURED){
+    pull();
+    setInterval(function(){ if (!document.hidden) pull(); }, 8000);
+    document.addEventListener("visibilitychange", function(){ if (!document.hidden) pull(); });
+    window.addEventListener("focus", pull);
+  }
+})();
+</script>
+</body>
+</html>
